@@ -1,0 +1,12 @@
+{
+  "name": "nexmosphere-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "serialport": "^12.0.0",
+    "@serialport/parser-readline": "^12.0.0",
+    "socket.io": "^4.6.1"
+  }
+}

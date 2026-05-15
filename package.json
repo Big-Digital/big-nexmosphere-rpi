@@ -1,0 +1,14 @@
+{
+  "name": "nexmosphere-shelf-monitor",
+  "version": "1.0.0",
+  "description": "Nexmosphere XZ Weight Sensor Shelf Monitor",
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

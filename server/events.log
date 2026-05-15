@@ -1,0 +1,5 @@
+{"raw":"X001B[PICKUP]","address":"X001","timestamp":"2026-05-15T15:14:44.376Z","type":"PICKUP","event":"Item lifted from shelf"}
+{"raw":"X001B[STOCKCHANGE=+01]","address":"X001","timestamp":"2026-05-15T15:14:44.393Z","type":"STOCKCHANGE","stock_change":1,"direction":"INCREASE","event":"Stock increased by 1 (item returned)"}
+{"raw":"X001B[STOCK=017]","address":"X001","timestamp":"2026-05-15T15:14:44.417Z","type":"STOCK","stock_count":17,"event":"Absolute stock count: 17 item(s)"}
+{"raw":"X001B[WEIGHT=+001.500]","address":"X001","timestamp":"2026-05-15T15:14:44.441Z","type":"WEIGHT","weight_kg":1.5,"weight_g":1500,"event":"Absolute weight: 1.500 kg (1500 g)"}
+{"raw":"X001B[ANOMALY01=DETECTED]","address":"X001","timestamp":"2026-05-15T15:14:44.464Z","type":"ANOMALY_DETECTED","anomaly_id":"01","event":"Anomaly 01 detected (unexpected item weight)"}

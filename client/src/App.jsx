@@ -81,20 +81,26 @@ const THEMES = {
 function playPickupSound(ctx) {
   if (!ctx) return
   const now = ctx.currentTime
-  // Two-tone descending alert: high → mid → silence
   const freqs = [880, 660]
-  freqs.forEach((freq, i) => {
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(freq, now + i * 0.18)
-    gain.gain.setValueAtTime(0.45, now + i * 0.18)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.18 + 0.22)
-    osc.start(now + i * 0.18)
-    osc.stop(now + i * 0.18 + 0.25)
-  })
+  const cycleDuration = 0.55  // gap between repeats
+  const totalDuration = 4.0
+  const repetitions = Math.floor(totalDuration / cycleDuration)
+
+  for (let r = 0; r < repetitions; r++) {
+    const offset = r * cycleDuration
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(freq, now + offset + i * 0.18)
+      gain.gain.setValueAtTime(0.45, now + offset + i * 0.18)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + i * 0.18 + 0.22)
+      osc.start(now + offset + i * 0.18)
+      osc.stop(now + offset + i * 0.18 + 0.25)
+    })
+  }
 }
 
 function playReturnSound(ctx) {

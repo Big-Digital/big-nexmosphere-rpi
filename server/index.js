@@ -120,10 +120,8 @@ function broadcastEvent(event) {
 
   } else if (event.type === 'WEIGHT') {
     io.emit('state_change', { state: 'IDLE', event });
-
-  } else if (event.type === 'ANOMALY_DETECTED' || event.type === 'ANOMALY_CLEARED') {
-    io.emit('state_change', { state: 'ANOMALY', event });
   }
+  // ANOMALY events are intentionally ignored — no state change triggered
 }
 
 // ─── Serial port setup ────────────────────────────────────────────────────

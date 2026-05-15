@@ -39,18 +39,6 @@ const THEMES = {
     badge: '#166534',
     badgeText: '#bbf7d0',
   },
-  ANOMALY: {
-    bg: '#1c1917',
-    panelBg: '#78350f',
-    accent: '#fb923c',
-    accentDim: '#78350f',
-    text: '#fff7ed',
-    subtext: '#fdba74',
-    label: 'ANOMALY DETECTED',
-    description: 'Weight mismatch — unexpected item weight',
-    badge: '#92400e',
-    badgeText: '#fed7aa',
-  },
 }
 
 // ─── Audio cues ───────────────────────────────────────────────────────────
@@ -92,22 +80,6 @@ function playReturnSound(ctx) {
   })
 }
 
-function playAnomalySound(ctx) {
-  if (!ctx) return
-  const now = ctx.currentTime
-  const osc = ctx.createOscillator()
-  const gain = ctx.createGain()
-  osc.connect(gain)
-  gain.connect(ctx.destination)
-  osc.type = 'square'
-  osc.frequency.setValueAtTime(200, now)
-  osc.frequency.setValueAtTime(150, now + 0.1)
-  osc.frequency.setValueAtTime(200, now + 0.2)
-  gain.gain.setValueAtTime(0.2, now)
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4)
-  osc.start(now)
-  osc.stop(now + 0.4)
-}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 function fmtTime(iso) {
@@ -140,8 +112,6 @@ const SIM_PRESETS = [
   { label: 'STOCK -1',          msg: 'X001B[STOCKCHANGE=-01]',   color: '#1e3a5f' },
   { label: 'STOCK ABS = 017',   msg: 'X001B[STOCK=017]',         color: '#1e293b' },
   { label: 'WEIGHT 1.500 kg',   msg: 'X001B[WEIGHT=+001.500]',   color: '#2d1b69' },
-  { label: 'ANOMALY DETECTED',  msg: 'X001B[ANOMALY01=DETECTED]',color: '#78350f' },
-  { label: 'ANOMALY CLEARED',   msg: 'X001B[ANOMALY01=CLEARED]', color: '#134e4a' },
   { label: 'CALIBRATION DONE',  msg: 'X001B[CALIBRATION=DONE]',  color: '#1c4532' },
 ]
 
@@ -184,7 +154,6 @@ export default function App() {
     const ctx = audioCtxRef.current
     if (shelfState === 'PICKUP') playPickupSound(ctx)
     else if (shelfState === 'RETURNED') playReturnSound(ctx)
-    else if (shelfState === 'ANOMALY') playAnomalySound(ctx)
   }, [shelfState, ensureAudio])
 
   // Auto-scroll log
@@ -233,7 +202,7 @@ export default function App() {
     })
 
     socket.on('state_change', ({ state }) => {
-      setShelfState(state)
+      if (state !== 'ANOMALY') setShelfState(state)
     })
 
     return () => socket.disconnect()

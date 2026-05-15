@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
+import CalibrationPanel from './CalibrationPanel.jsx'
 
 // ─── Theme config per shelf state ─────────────────────────────────────────
 const THEMES = {
@@ -124,6 +125,7 @@ export default function App() {
   const [lastEvent, setLastEvent] = useState(null)
   const [serialStatus, setSerialStatus] = useState({ connected: false })
   const [wsConnected, setWsConnected] = useState(false)
+  const [lastCalibDone, setLastCalibDone] = useState(null)
   const [simInput, setSimInput] = useState('')
   const [simOpen, setSimOpen] = useState(true)
   const [logFilter, setLogFilter] = useState('ALL')
@@ -199,6 +201,7 @@ export default function App() {
 
     socket.on('sensor_event', (event) => {
       addEvent(event)
+      if (event.type === 'CALIBRATION_DONE') setLastCalibDone(Date.now())
     })
 
     socket.on('state_change', ({ state }) => {
@@ -586,6 +589,13 @@ export default function App() {
           </div>
         )}
       </div>
+
+      {/* ── Calibration panel ── */}
+      <CalibrationPanel
+        serialConnected={serialStatus.connected}
+        lastCalibDone={lastCalibDone}
+        theme={theme}
+      />
 
       {/* ── Event log ── */}
       <div style={s.logPanel}>

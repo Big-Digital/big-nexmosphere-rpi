@@ -7,6 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/simulate': 'http://localhost:3001',
+      '/command': 'http://localhost:3001',
       '/logs': 'http://localhost:3001',
       '/status': 'http://localhost:3001',
       '/socket.io': {

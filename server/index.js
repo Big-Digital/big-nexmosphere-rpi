@@ -126,6 +126,7 @@ function broadcastEvent(event) {
 
 // ─── Serial port setup ────────────────────────────────────────────────────
 let serialConnected = false;
+let serialPort = null; // module-level so /command can write to it
 
 function initSerial() {
   try {
@@ -133,6 +134,7 @@ function initSerial() {
     const { ReadlineParser } = require('@serialport/parser-readline');
 
     const port = new SerialPort({ path: SERIAL_PORT, baudRate: BAUD_RATE });
+    serialPort = port;
     const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
     port.on('open', () => {
@@ -196,6 +198,22 @@ app.get('/logs', (req, res) => {
   }
 });
 
+// Send a command directly to the sensor via serial
+app.post('/command', (req, res) => {
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ ok: false, error: 'message required' });
+
+  if (!serialPort || !serialConnected) {
+    return res.status(503).json({ ok: false, error: 'Serial port not connected — connect hardware first' });
+  }
+
+  serialPort.write(message + '\r\n', (err) => {
+    if (err) return res.status(500).json({ ok: false, error: err.message });
+    console.log(`[CMD] → ${message}`);
+    res.json({ ok: true, sent: message });
+  });
+});
+
 // Clear log file
 app.delete('/logs', (req, res) => {
   fs.writeFileSync(LOG_FILE, '');
@@ -240,7 +258,7 @@ const clientDist = path.join(__dirname, '../client/dist');
 if (fs.existsSync(clientDist)) {
   app.use(express.static(clientDist));
   // SPA fallback — serve index.html for all non-API routes
-  app.get(/^(?!\/simulate|\/logs|\/status).*/, (req, res) => {
+  app.get(/^(?!\/simulate|\/logs|\/status|\/command).*/, (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });
   console.log(`[SERVER] Serving built client from ${clientDist}`);

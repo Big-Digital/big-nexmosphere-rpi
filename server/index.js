@@ -251,21 +251,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// ─── Serve built React app (production / RPi) ─────────────────────────────
-// Build once on dev machine with: npm run build
-// Then the RPi only needs: node server/index.js
-const clientDist = path.join(__dirname, '../client/dist');
-if (fs.existsSync(clientDist)) {
-  app.use(express.static(clientDist));
-  // SPA fallback — serve index.html for all non-API routes
-  app.get(/^(?!\/simulate|\/logs|\/status|\/command).*/, (req, res) => {
-    res.sendFile(path.join(clientDist, 'index.html'));
-  });
-  console.log(`[SERVER] Serving built client from ${clientDist}`);
-} else {
-  console.log('[SERVER] No client/dist found — run "npm run build" or use Vite dev server');
-}
-
 // ─── Start ────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`[SERVER] Nexmosphere monitor running on http://localhost:${PORT}`);

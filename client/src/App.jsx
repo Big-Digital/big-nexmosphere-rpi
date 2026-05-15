@@ -205,7 +205,7 @@ export default function App() {
     })
 
     socket.on('state_change', ({ state }) => {
-      if (state !== 'ANOMALY') setShelfState(state)
+      setShelfState(state)
     })
 
     return () => socket.disconnect()

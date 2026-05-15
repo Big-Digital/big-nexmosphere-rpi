@@ -120,8 +120,12 @@ function broadcastEvent(event) {
 
   } else if (event.type === 'WEIGHT') {
     io.emit('state_change', { state: 'IDLE', event });
+
+  } else if (event.type === 'ANOMALY_CLEARED') {
+    // Weight stabilised after item was placed back — treat as return
+    io.emit('state_change', { state: 'RETURNED', event });
   }
-  // ANOMALY events are intentionally ignored — no state change triggered
+  // ANOMALY_DETECTED is ignored — it fires during the transition while item is landing
 }
 
 // ─── Serial port setup ────────────────────────────────────────────────────

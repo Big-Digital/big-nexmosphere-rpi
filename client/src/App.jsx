@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import CalibrationPanel from './CalibrationPanel.jsx'
+import EmergencyPanel from './EmergencyPanel.jsx'
 
 // ─── Theme config per shelf state ─────────────────────────────────────────
 const THEMES = {
@@ -589,6 +590,9 @@ export default function App() {
           </div>
         )}
       </div>
+
+      {/* ── Emergency broadcast ── */}
+      <EmergencyPanel />
 
       {/* ── Calibration panel ── */}
       <CalibrationPanel

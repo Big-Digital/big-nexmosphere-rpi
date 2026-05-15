@@ -3,6 +3,40 @@ import { io } from 'socket.io-client'
 import CalibrationPanel from './CalibrationPanel.jsx'
 import EmergencyPanel from './EmergencyPanel.jsx'
 
+// ─── Emergency API auto-trigger ───────────────────────────────────────────
+const EMERGENCY_URL = 'https://epaper-cms.vercel.app/api/emergency'
+const EMERGENCY_PIN = '1234'
+
+async function triggerEmergency() {
+  try {
+    await fetch(EMERGENCY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin: EMERGENCY_PIN,
+        active: true,
+        template: 'headline',
+        line1: 'Trigger from Lift and Sell',
+        line2: '',
+      }),
+    })
+  } catch (err) {
+    console.error('[EMERGENCY] Trigger failed:', err.message)
+  }
+}
+
+async function clearEmergency() {
+  try {
+    await fetch(EMERGENCY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: EMERGENCY_PIN, active: false }),
+    })
+  } catch (err) {
+    console.error('[EMERGENCY] Clear failed:', err.message)
+  }
+}
+
 // ─── Theme config per shelf state ─────────────────────────────────────────
 const THEMES = {
   IDLE: {
@@ -207,6 +241,8 @@ export default function App() {
 
     socket.on('state_change', ({ state }) => {
       setShelfState(state)
+      if (state === 'PICKUP') triggerEmergency()
+      else if (state === 'RETURNED') clearEmergency()
     })
 
     return () => socket.disconnect()

@@ -81,24 +81,29 @@ const THEMES = {
 function playPickupSound(ctx) {
   if (!ctx) return
   const now = ctx.currentTime
-  const freqs = [880, 660]
-  const cycleDuration = 0.55  // gap between repeats
-  const totalDuration = 4.0
-  const repetitions = Math.floor(totalDuration / cycleDuration)
+  // Slow descending bowl chime: G5 → E5 → C5, loops gently for ~4s
+  const notes    = [783.99, 659.25, 523.25]
+  const spacing  = 0.45   // time between each note strike
+  const decay    = 1.2    // long ring-out per note
+  const pause    = 0.5    // silence between cycles
+  const cycle    = notes.length * spacing + pause   // ~1.85s per cycle
+  const reps     = Math.ceil(4.0 / cycle)           // enough cycles to fill 4s
 
-  for (let r = 0; r < repetitions; r++) {
-    const offset = r * cycleDuration
-    freqs.forEach((freq, i) => {
+  for (let r = 0; r < reps; r++) {
+    notes.forEach((freq, i) => {
+      const t = now + r * cycle + i * spacing
+      if (t - now > 4.1) return  // don't schedule past 4s
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       osc.connect(gain)
       gain.connect(ctx.destination)
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(freq, now + offset + i * 0.18)
-      gain.gain.setValueAtTime(0.45, now + offset + i * 0.18)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + i * 0.18 + 0.22)
-      osc.start(now + offset + i * 0.18)
-      osc.stop(now + offset + i * 0.18 + 0.25)
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(freq, t)
+      gain.gain.setValueAtTime(0, t)
+      gain.gain.linearRampToValueAtTime(0.3, t + 0.008)
+      gain.gain.exponentialRampToValueAtTime(0.001, t + decay)
+      osc.start(t)
+      osc.stop(t + decay + 0.05)
     })
   }
 }
@@ -106,19 +111,24 @@ function playPickupSound(ctx) {
 function playReturnSound(ctx) {
   if (!ctx) return
   const now = ctx.currentTime
-  // Three-note ascending chime: C5 → E5 → G5
-  const notes = [523.25, 659.25, 783.99]
+  // Slow, warm bowl chime: C5 → E5 → G5 → C6
+  const notes = [523.25, 659.25, 783.99, 1046.50]
+  const spacing = 0.45   // slow BPM between notes
+  const decay   = 1.5    // long lingering tail
+
   notes.forEach((freq, i) => {
+    const t = now + i * spacing
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
     osc.connect(gain)
     gain.connect(ctx.destination)
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(freq, now + i * 0.15)
-    gain.gain.setValueAtTime(0.38, now + i * 0.15)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.3)
-    osc.start(now + i * 0.15)
-    osc.stop(now + i * 0.15 + 0.35)
+    osc.type = 'triangle'               // rounder, softer timbre than sine
+    osc.frequency.setValueAtTime(freq, t)
+    gain.gain.setValueAtTime(0, t)
+    gain.gain.linearRampToValueAtTime(0.28, t + 0.008)   // instant strike
+    gain.gain.exponentialRampToValueAtTime(0.001, t + decay)
+    osc.start(t)
+    osc.stop(t + decay + 0.05)
   })
 }
 
